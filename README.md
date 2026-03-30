@@ -116,7 +116,7 @@ Allows fair cross-country salary comparison.
 
 
 <p align="center">
-  <img src="image/59461358d316f4e5d6a2e1a85e6ac1f0.png" width="700">
+  <img src="image/Figure_2.png" width="700">
 </p>
 
 
@@ -128,6 +128,12 @@ bonus_ratio = bonus_usd / salary_usd
 
 Measures compensation structure efficiency.
 
+
+<p align="center">
+  <img src="image/Figure_3.png" width="700">
+</p>
+
+
 ---
 
 ### Skill Value
@@ -135,6 +141,7 @@ skill_value = skill_demand_score / (automation_risk + 1)
 
 
 Identifies high-value talent with strong skills and lower automation risk.
+
 
 ---
 
@@ -167,6 +174,7 @@ Two types of machine learning approaches were used:
 | Baseline Model | 14,997 | 0.8829 |
 
 The **Gradient Boosting model** achieved the best performance and was selected as the final predictive model.
+
 
 ---
 
@@ -216,6 +224,12 @@ K = 4
 
 The model explains **~93% of salary variance**, indicating strong predictive power.
 
+
+<p align="center">
+  <img src="image/learning_curve.png" width="700">
+</p>
+
+
 ---
 
 ## Feature Importance
@@ -249,6 +263,12 @@ Salary increases significantly across experience groups:
 - 6–10 years  
 - 11+ years  
 
+
+<p align="center">
+  <img src="image/Figure_1.png" width="700">
+</p>
+
+
 ### Recommendation
 
 Companies should implement **dual career tracks**:
@@ -274,6 +294,12 @@ Lower-cost talent markets:
 - 🇧🇷 Brazil  
 - 🇦🇪 UAE  
 
+
+<p align="center">
+  <img src="image/region.png" width="700">
+</p>
+
+
 ### Recommendation
 
 Adopt **global hiring strategies**:
@@ -292,6 +318,12 @@ Salary distributions across roles overlap heavily:
 - NLP Engineer  
 
 This indicates **skills outweigh titles**.
+
+
+<p align="center">
+  <img src="image/Figure_6.png" width="700">
+</p>
+
 
 ### Recommendation
 
