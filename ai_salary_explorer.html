@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global AI Jobs — Salary Explorer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0e14;
+    --surface: #12161f;
+    --surface2: #1a1f2c;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #e8eaf0;
+    --text2: #8890a4;
+    --text3: #525a6e;
+    --accent: #4fc8a0;
+    --accent2: #6b8fff;
+    --accent3: #ff7a5c;
+    --accent4: #c97bff;
+    --entry: #4fc8a0;
+    --mid: #6b8fff;
+    --senior: #c97bff;
+    --lead: #ff7a5c;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* Header */
+  .header { margin-bottom: 48px; }
+  .header-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .header-tag::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--accent);
+    display: inline-block;
+  }
+  .header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--text);
+  }
+  .header h1 span { color: var(--accent); }
+  .header-meta {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--text2);
+    display: flex; gap: 20px; flex-wrap: wrap;
+  }
+  .header-meta span::before { content: '· '; }
+
+  /* Tabs */
+  .tabs {
+    display: flex; gap: 2px;
+    margin-bottom: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    width: fit-content;
+  }
+  .tab-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    padding: 8px 20px;
+    border-radius: 7px;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text2);
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border2);
+  }
+  .tab-btn:hover:not(.active) { color: var(--text); }
+
+  /* Controls */
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    align-items: center;
+    margin-bottom: 28px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .ctrl { display: flex; align-items: center; gap: 8px; }
+  .ctrl label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+  select {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 6px 12px;
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    padding-right: 28px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238890a4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+  select:focus { border-color: var(--accent); }
+
+  /* Stats row */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .stat-card.c-green::before { background: var(--entry); }
+  .stat-card.c-blue::before { background: var(--accent2); }
+  .stat-card.c-purple::before { background: var(--senior); }
+  .stat-card.c-orange::before { background: var(--lead); }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+  .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .stat-sub {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+
+  /* Chart area */
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .chart-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text2);
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .chart-wrap { position: relative; width: 100%; height: 340px; }
+
+  /* Heatmap */
+  .heatmap-scroll { overflow-x: auto; padding-bottom: 4px; }
+  .hm-table { border-collapse: separate; border-spacing: 3px; width: 100%; }
+  .hm-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 6px;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .hm-table th.row-head { text-align: left; min-width: 170px; }
+  .hm-table td.row-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text2);
+    padding-right: 10px;
+    white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .hm-cell {
+    border-radius: 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    text-align: center;
+    padding: 6px 4px;
+    min-width: 62px;
+    cursor: default;
+    transition: transform 0.15s, opacity 0.15s;
+    position: relative;
+  }
+  .hm-cell:hover { transform: scale(1.08); opacity: 0.9; z-index: 2; }
+  .hm-cell.empty { background: rgba(255,255,255,0.03); color: var(--text3); }
+
+  /* Scale bar */
+  .scale-bar {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+  }
+  .scale-grad {
+    display: flex; gap: 2px;
+    flex: 0 0 auto;
+  }
+  .scale-stop { width: 26px; height: 12px; border-radius: 2px; }
+
+  /* Section hidden */
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  /* Footer */
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  @media (max-width: 600px) {
+    .page { padding: 28px 16px 60px; }
+    .header h1 { font-size: 28px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .chart-wrap { height: 260px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-tag">Data Explorer</div>
+    <h1>Global AI Jobs<br><span>Salary</span> Explorer</h1>
+    <div class="header-meta">
+      <span>90,000 records</span>
+      <span>12 countries</span>
+      <span>8 job roles</span>
+      <span>4 experience levels</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('bar')">分组条形图</button>
+    <button class="tab-btn" onclick="switchTab('heatmap')">热力图</button>
+  </div>
+
+  <!-- BAR SECTION -->
+  <div class="section visible" id="bar-section">
+    <div class="controls">
+      <div class="ctrl">
+        <label>职位</label>
+        <select id="roleSelect" onchange="updateBar()"></select>
+      </div>
+      <div class="ctrl">
+        <label>排序</label>
+        <select id="sortSelect" onchange="updateBar()">
+          <option value="country">按国家字母</option>
+          <option value="lead">按 Lead 薪资↓</option>
+          <option value="entry">按 Entry 薪资↓</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="stats" id="statRow"></div>
+
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title" id="barTitle">平均薪资（USD）</div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot" style="background:var(--entry)"></span>Entry</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--mid)"></span>Mid</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--senior)"></span>Senior</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--lead)"></span>Lead</span>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- HEATMAP SECTION -->
+  <div class="section" id="heatmap-section">
+    <div class="controls">
+      <div class="ctrl">
+        <label>经验等级</label>
+        <select id="expSelect" onchange="updateHeatmap()">
+          <option>Entry</option>
+          <option>Mid</option>
+          <option selected>Senior</option>
+          <option>Lead</option>
+        </select>
+      </div>
+      <div class="ctrl">
+        <label>颜色比例</label>
+        <select id="scaleSelect" onchange="updateHeatmap()">
+          <option value="global">全局范围</option>
+          <option value="local">当前筛选</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title" id="hmTitle">薪资热力图 — Senior 级别</div>
+      </div>
+      <div class="heatmap-scroll">
+        <table class="hm-table" id="hmTable"></table>
+      </div>
+      <div class="scale-bar">
+        <span>低</span>
+        <div class="scale-grad" id="colorScale"></div>
+        <span>高</span>
+        <span style="margin-left:12px">单位：千美元 (k USD)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Source: global_ai_jobs.csv · 90,000 records</span>
+    <span>Avg salary by job role × country × experience</span>
+  </div>
+
+</div>
+
+<script>
+const DATA = {"Machine Learning Engineer":{"UAE":{"Entry":62001,"Mid":80218,"Lead":145028,"Senior":108345},"Germany":{"Entry":66945,"Mid":84903,"Lead":157835,"Senior":112873},"Brazil":{"Lead":83505,"Mid":45079,"Entry":35411,"Senior":61460},"Singapore":{"Senior":134383,"Mid":99833,"Entry":78395,"Lead":183807},"USA":{"Senior":151911,"Lead":209433,"Mid":112410,"Entry":89351},"Netherlands":{"Mid":87446,"Lead":158452,"Senior":115354,"Entry":68428},"France":{"Entry":65450,"Mid":82520,"Lead":148677,"Senior":109283},"India":{"Mid":35852,"Entry":29857,"Lead":66316,"Senior":48999},"Canada":{"Lead":168861,"Mid":94274,"Senior":125962,"Entry":73443},"Australia":{"Entry":73523,"Senior":125352,"Lead":172718,"Mid":93461},"Japan":{"Senior":112176,"Entry":65790,"Mid":84120,"Lead":156536},"UK":{"Mid":87668,"Senior":120112,"Lead":163825,"Entry":69307}},"AI Engineer":{"USA":{"Entry":84160,"Senior":146513,"Mid":107727,"Lead":199104},"Netherlands":{"Entry":65856,"Mid":82225,"Senior":112458,"Lead":155210},"Singapore":{"Entry":75463,"Senior":125594,"Lead":175554,"Mid":96221},"Canada":{"Lead":162198,"Senior":120344,"Mid":89223,"Entry":70507},"Australia":{"Senior":122435,"Mid":90165,"Entry":71331,"Lead":169122},"UK":{"Entry":66785,"Lead":153775,"Senior":112832,"Mid":85222},"France":{"Mid":77528,"Senior":104221,"Lead":141963,"Entry":61888},"India":{"Lead":64574,"Senior":46444,"Mid":34955,"Entry":29242},"Brazil":{"Mid":42956,"Senior":58683,"Entry":34423,"Lead":79603},"Japan":{"Mid":80606,"Lead":148819,"Entry":62925,"Senior":108467},"UAE":{"Entry":59516,"Lead":139480,"Senior":101817,"Mid":75865},"Germany":{"Lead":149086,"Senior":108892,"Mid":81784,"Entry":63940}},"Research Scientist":{"Brazil":{"Entry":38294,"Lead":89548,"Senior":66903,"Mid":49090},"Australia":{"Lead":184390,"Mid":99353,"Senior":134446,"Entry":80018},"UK":{"Entry":74091,"Senior":125868,"Lead":174312,"Mid":94736},"Germany":{"Mid":90864,"Lead":165840,"Entry":72283,"Senior":122539},"Japan":{"Entry":71708,"Lead":165107,"Senior":123000,"Mid":89886},"UAE":{"Entry":67633,"Mid":85224,"Lead":154268,"Senior":113085},"Canada":{"Lead":187483,"Entry":79690,"Senior":133936,"Mid":100589},"Singapore":{"Mid":106233,"Entry":85612,"Senior":143904,"Lead":197158},"Netherlands":{"Senior":125575,"Mid":94668,"Entry":74350,"Lead":172438},"India":{"Senior":52945,"Lead":71227,"Entry":31076,"Mid":39213},"USA":{"Mid":120885,"Senior":164831,"Entry":97127,"Lead":224492},"France":{"Lead":163210,"Mid":86777,"Entry":69397,"Senior":117251}},"Software Engineer AI":{"India":{"Senior":45907,"Mid":34138,"Entry":28885,"Lead":62513},"France":{"Entry":60246,"Lead":140124,"Mid":75637,"Senior":103512},"USA":{"Entry":84499,"Mid":107217,"Senior":143663,"Lead":197624},"Brazil":{"Senior":58777,"Mid":42805,"Entry":33774,"Lead":78062},"Germany":{"Senior":108199,"Entry":62290,"Mid":80195,"Lead":148479},"Australia":{"Lead":164149,"Mid":88160,"Entry":69988,"Senior":120417},"Netherlands":{"Lead":153547,"Senior":110291,"Entry":64068,"Mid":82445},"Canada":{"Mid":87687,"Senior":118103,"Lead":158843,"Entry":68856},"UAE":{"Mid":74213,"Lead":136902,"Entry":59756,"Senior":101168},"Japan":{"Mid":78367,"Lead":146262,"Entry":61855,"Senior":107217},"UK":{"Senior":113822,"Mid":83295,"Lead":150747,"Entry":66776},"Singapore":{"Entry":72765,"Mid":93499,"Lead":172937,"Senior":125851}},"Data Analyst":{"Japan":{"Senior":76210,"Lead":104305,"Entry":44498,"Mid":56677},"Brazil":{"Mid":31636,"Lead":56228,"Senior":41824,"Entry":28115},"USA":{"Lead":141890,"Senior":104673,"Mid":77132,"Entry":60251},"Australia":{"Lead":116185,"Senior":86188,"Mid":63735,"Entry":49950},"France":{"Senior":75583,"Entry":43846,"Lead":103203,"Mid":54495},"Canada":{"Mid":63331,"Lead":114565,"Entry":50366,"Senior":84930},"UAE":{"Lead":98536,"Mid":54960,"Senior":71593,"Entry":42413},"Singapore":{"Mid":67560,"Lead":124380,"Senior":90954,"Entry":53347},"Netherlands":{"Mid":59175,"Entry":46696,"Lead":107557,"Senior":80209},"Germany":{"Lead":105388,"Entry":45592,"Mid":57837,"Senior":78249},"India":{"Lead":44144,"Entry":28000,"Senior":33474,"Mid":28322},"UK":{"Entry":46627,"Senior":79359,"Lead":110136,"Mid":59081}},"Computer Vision Engineer":{"Germany":{"Lead":153816,"Mid":84188,"Senior":114779,"Entry":66931},"UAE":{"Mid":78692,"Lead":144726,"Entry":62055,"Senior":104435},"Singapore":{"Mid":98370,"Senior":132989,"Entry":77598,"Lead":182848},"France":{"Senior":109094,"Lead":146019,"Entry":63139,"Mid":81250},"Japan":{"Lead":153841,"Senior":110482,"Entry":65575,"Mid":83363},"Netherlands":{"Lead":156671,"Mid":85505,"Entry":68983,"Senior":116885},"UK":{"Entry":69502,"Senior":119180,"Mid":88179,"Lead":161728},"Canada":{"Entry":73081,"Lead":169302,"Mid":91476,"Senior":122984},"USA":{"Mid":112518,"Senior":150803,"Entry":87442,"Lead":207259},"India":{"Mid":35806,"Entry":29607,"Lead":66081,"Senior":47378},"Australia":{"Lead":173033,"Mid":93510,"Entry":73886,"Senior":126929},"Brazil":{"Entry":34932,"Mid":44775,"Lead":82250,"Senior":60259}},"NLP Engineer":{"Australia":{"Senior":122643,"Entry":72018,"Mid":90946,"Lead":168149},"India":{"Lead":65119,"Senior":46849,"Entry":29263,"Mid":35955},"UK":{"Mid":84164,"Lead":160084,"Entry":66920,"Senior":115649},"Singapore":{"Mid":97750,"Lead":175022,"Senior":132646,"Entry":74709},"Canada":{"Senior":122415,"Mid":90653,"Entry":71659,"Lead":164742},"Brazil":{"Senior":59428,"Mid":44021,"Entry":34758,"Lead":81180},"USA":{"Senior":146284,"Entry":86516,"Mid":110650,"Lead":203183},"Germany":{"Mid":84065,"Lead":151270,"Senior":112482,"Entry":65628},"UAE":{"Entry":60874,"Senior":104790,"Lead":141248,"Mid":77367},"Japan":{"Lead":148536,"Entry":64703,"Mid":80700,"Senior":109187},"France":{"Entry":62128,"Lead":145152,"Mid":79579,"Senior":108434},"Netherlands":{"Mid":84910,"Lead":155859,"Senior":115240,"Entry":67494}},"Data Scientist":{"Singapore":{"Mid":89436,"Lead":169457,"Entry":71564,"Senior":124814},"Canada":{"Mid":84947,"Entry":67108,"Senior":117415,"Lead":153165},"Australia":{"Entry":68494,"Senior":116106,"Lead":158685,"Mid":86563},"France":{"Senior":101648,"Entry":59320,"Mid":74834,"Lead":137671},"Brazil":{"Senior":56260,"Lead":76653,"Entry":33039,"Mid":41219},"UK":{"Entry":63813,"Senior":109255,"Lead":148126,"Mid":80036},"Netherlands":{"Lead":146916,"Senior":108663,"Mid":79846,"Entry":62759},"Japan":{"Senior":103278,"Lead":142150,"Entry":60511,"Mid":77026},"Germany":{"Mid":77745,"Senior":104452,"Entry":61053,"Lead":143184},"UAE":{"Entry":57571,"Lead":132234,"Mid":72687,"Senior":98988},"USA":{"Mid":102900,"Senior":140210,"Lead":193941,"Entry":82324},"India":{"Lead":61379,"Entry":28661,"Mid":33059,"Senior":44553}}};
+
+const ROLES = Object.keys(DATA);
+const COUNTRIES = ["USA","Canada","UK","Australia","Singapore","Germany","Netherlands","France","Japan","UAE","Brazil","India"];
+const EXP = ["Entry","Mid","Senior","Lead"];
+const EXP_COLORS = {
+  Entry: "#4fc8a0",
+  Mid:   "#6b8fff",
+  Senior:"#c97bff",
+  Lead:  "#ff7a5c"
+};
+
+let barChart = null;
+
+// Populate role select
+const sel = document.getElementById('roleSelect');
+ROLES.forEach(r => { const o = document.createElement('option'); o.value = o.textContent = r; sel.appendChild(o); });
+
+function switchTab(t) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (t==='bar'&&i===0)||(t==='heatmap'&&i===1)));
+  document.getElementById('bar-section').classList.toggle('visible', t==='bar');
+  document.getElementById('heatmap-section').classList.toggle('visible', t==='heatmap');
+  if (t==='heatmap') updateHeatmap();
+}
+
+function updateBar() {
+  const role = document.getElementById('roleSelect').value;
+  const sort = document.getElementById('sortSelect').value;
+  const rd = DATA[role];
+  let countries = [...COUNTRIES];
+  if (sort === 'lead') countries.sort((a,b) => (rd[b]?.Lead||0)-(rd[a]?.Lead||0));
+  if (sort === 'entry') countries.sort((a,b) => (rd[b]?.Entry||0)-(rd[a]?.Entry||0));
+
+  document.getElementById('barTitle').textContent = role + ' — 平均薪资（USD）';
+
+  // Stats
+  const topLeadC = countries.reduce((best,c) => (rd[c]?.Lead||0)>(rd[best]?.Lead||0)?c:best, countries[0]);
+  const avgLead = Math.round(countries.reduce((s,c)=>s+(rd[c]?.Lead||0),0)/countries.length);
+  const maxEntry = Math.max(...countries.map(c=>rd[c]?.Entry||0));
+  const indiaRatio = Math.round((rd['India']?.Lead||0)/(rd['USA']?.Lead||1)*100);
+
+  document.getElementById('statRow').innerHTML = `
+    <div class="stat-card c-orange">
+      <div class="stat-label">最高 Lead 薪资</div>
+      <div class="stat-val" style="color:var(--lead)">$${Math.round((rd[topLeadC]?.Lead||0)/1000)}k</div>
+      <div class="stat-sub">${topLeadC}</div>
+    </div>
+    <div class="stat-card c-purple">
+      <div class="stat-label">Lead 平均（12国）</div>
+      <div class="stat-val" style="color:var(--senior)">$${Math.round(avgLead/1000)}k</div>
+      <div class="stat-sub">all countries avg</div>
+    </div>
+    <div class="stat-card c-green">
+      <div class="stat-label">最高 Entry 薪资</div>
+      <div class="stat-val" style="color:var(--entry)">$${Math.round(maxEntry/1000)}k</div>
+      <div class="stat-sub">entry level peak</div>
+    </div>
+    <div class="stat-card c-blue">
+      <div class="stat-label">India vs USA (Lead)</div>
+      <div class="stat-val" style="color:var(--mid)">${indiaRatio}%</div>
+      <div class="stat-sub">salary ratio</div>
+    </div>
+  `;
+
+  const datasets = EXP.map(exp => ({
+    label: exp,
+    data: countries.map(c => Math.round((rd[c]?.[exp]||0)/1000)),
+    backgroundColor: EXP_COLORS[exp] + '99',
+    borderColor: EXP_COLORS[exp],
+    borderWidth: 1,
+    borderRadius: 4,
+    borderSkipped: false
+  }));
+
+  if (barChart) barChart.destroy();
+  const allVals = countries.flatMap(c => EXP.map(e => Math.round((rd[c]?.[e]||0)/1000)));
+  const maxV = Math.max(...allVals);
+
+  barChart = new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: { labels: countries, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1f2c',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          titleColor: '#e8eaf0',
+          bodyColor: '#8890a4',
+          padding: 10,
+          callbacks: { label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y}k` }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#525a6e', font: { size: 11, family: 'DM Mono' }, autoSkip: false, maxRotation: 35 },
+          grid: { display: false },
+          border: { color: 'rgba(255,255,255,0.07)' }
+        },
+        y: {
+          ticks: { color: '#525a6e', font: { size: 11, family: 'DM Mono' }, callback: v => '$'+v+'k' },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          border: { display: false },
+          max: Math.ceil(maxV * 1.12 / 10) * 10
+        }
+      }
+    }
+  });
+}
+
+// Heatmap
+function heatColor(val, min, max) {
+  const t = Math.max(0, Math.min(1, (val - min) / (max - min + 1)));
+  const stops = [
+    [15,25,45], [20,45,90], [30,80,140], [55,130,195], [90,180,210], [79,200,160]
+  ];
+  const i = Math.min(Math.floor(t * (stops.length-1)), stops.length-2);
+  const f = t*(stops.length-1)-i;
+  const c = stops[i].map((v,j) => Math.round(v + f*(stops[i+1][j]-v)));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+function textColor(val, min, max) {
+  const t = (val-min)/(max-min+1);
+  return t > 0.45 ? '#fff' : '#a0b4cc';
+}
+
+function updateHeatmap() {
+  const exp = document.getElementById('expSelect').value;
+  const scaleMode = document.getElementById('scaleSelect').value;
+  document.getElementById('hmTitle').textContent = `薪资热力图 — ${exp} 级别`;
+
+  const allVals = [];
+  ROLES.forEach(r => COUNTRIES.forEach(c => { const v = DATA[r][c]?.[exp]; if(v) allVals.push(v); }));
+  const min = Math.min(...allVals), max = Math.max(...allVals);
+
+  let html = '<thead><tr><th class="row-head">职位</th>';
+  COUNTRIES.forEach(c => html += `<th>${c}</th>`);
+  html += '</tr></thead><tbody>';
+
+  ROLES.forEach(role => {
+    html += `<tr><td class="row-label">${role}</td>`;
+    COUNTRIES.forEach(c => {
+      const v = DATA[role][c]?.[exp];
+      if (v) {
+        const bg = heatColor(v, min, max);
+        const fg = textColor(v, min, max);
+        html += `<td class="hm-cell" style="background:${bg};color:${fg}" title="${role} · ${c} · ${exp}: $${Math.round(v/1000)}k">$${Math.round(v/1000)}k</td>`;
+      } else {
+        html += `<td class="hm-cell empty">—</td>`;
+      }
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  document.getElementById('hmTable').innerHTML = html;
+
+  const scale = document.getElementById('colorScale');
+  scale.innerHTML = Array.from({length:10},(_,i) => {
+    const v = min + (max-min)*i/9;
+    return `<div class="scale-stop" style="background:${heatColor(v,min,max)}"></div>`;
+  }).join('');
+}
+
+updateBar();
+</script>
+</body>
+</html>
