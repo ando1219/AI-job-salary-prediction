@@ -1,6 +1,6 @@
 # 🤖 AI Salary Prediction & Market Analysis
 
-> **一个对数据集的可视化网页：https://ando1219.github.io/AI-job-salary-prediction/ai_salary_explorer.html**
+> **对数据集进行了一下可视化：https://ando1219.github.io/AI-job-salary-prediction/ai_salary_explorer.html**
 
 
 使用AI模型对全球人工智能、数据科学和技术工作数据集（2020-2026 年）进行数据驱动分析，以预测薪资并揭示人工智能人才市场的战略见解。
