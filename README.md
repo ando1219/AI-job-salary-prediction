@@ -1,6 +1,6 @@
 # 🤖 AI Salary Prediction & Market Analysis
 
-> **AI UX & Data Visualisation Design Principles**
+> **dataset is visualized in https://ando1219.github.io/AI-job-salary-prediction/ai_salary_explorer.html**
 
 A data-driven analysis of the **Global AI, Data Science & Tech Jobs Dataset (2020–2026)** to predict salaries and uncover strategic insights about the AI talent market.
 
@@ -107,6 +107,8 @@ To improve model performance and interpretability, several transformations were 
 ### Adjusted Salary
 
 Adjusted Salary = Salary / Cost of Living Index
+
+
 Allows fair cross-country salary comparison.
 
 ---
