@@ -4,6 +4,9 @@
 
 A data-driven analysis of the **Global AI, Data Science & Tech Jobs Dataset (2020–2026)** to predict salaries and uncover strategic insights about the AI talent market.
 
+
+对全球人工智能、数据科学和技术工作数据集（2020-2026 年）进行数据驱动分析，以预测薪资并揭示人工智能人才市场的战略见解。
+
 ---
 
 # 📑 Table of Contents
