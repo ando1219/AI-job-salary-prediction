@@ -344,4 +344,4 @@ Potential improvements include:
 
 # 👨‍💻 Author
 
-Project developed for **CA6002 AI UX & Data Visualisation Design Principles**.
+Bairu.
