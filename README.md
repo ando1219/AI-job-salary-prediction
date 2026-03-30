@@ -1,6 +1,6 @@
 # 🤖 AI Salary Prediction & Market Analysis
 
-> **CA6002 – AI UX & Data Visualisation Design Principles**
+> **AI UX & Data Visualisation Design Principles**
 
 A data-driven analysis of the **Global AI, Data Science & Tech Jobs Dataset (2020–2026)** to predict salaries and uncover strategic insights about the AI talent market.
 
