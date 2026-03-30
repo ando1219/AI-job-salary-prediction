@@ -71,6 +71,12 @@ The analysis delivers practical benefits:
 
 The dataset contains salary data, skills, experience, and contextual job attributes across the global AI industry.
 
+
+<p align="center">
+  <img src="image/1b24304e056a434f64147c36cd8e29f8.png" width="700">
+</p>
+
+
 ---
 
 ## 👍 Dataset Strengths
