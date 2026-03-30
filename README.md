@@ -341,9 +341,3 @@ Potential improvements include:
 - Modeling **total compensation packages**
 - Exploring **deep learning models**
 - Developing an **interactive salary benchmarking dashboard**
-
----
-
-# 👨‍💻 Author
-
-Bairu.
