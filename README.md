@@ -116,7 +116,7 @@ Allows fair cross-country salary comparison.
 
 
 <p align="center">
-  <img src="images/59461358d316f4e5d6a2e1a85e6ac1f0.png" width="700">
+  <img src="image/59461358d316f4e5d6a2e1a85e6ac1f0.png" width="700">
 </p>
 
 
